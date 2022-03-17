@@ -41,6 +41,8 @@ class Train:
 
     @direction.setter
     def direction(self, value):
+        """Set the direction of the train.
+        """
         if value == self.FORWARD:
             self.in1.value(0)
             self.in2.value(1)
@@ -55,6 +57,8 @@ class Train:
 
     @property
     def speed(self):
+        """Set the speed of the train (0-65535.)
+        """
         return self._speed
 
     @speed.setter

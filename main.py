@@ -39,6 +39,8 @@ MAIN_LOOP_TIME = 0.005
 
 
 class SceneControl:
+    """Integrate all the hardware and provide controls for the scene.
+    """
     def __init__(self):
         self.smoke = Pin(28, Pin.OUT)
         self.pi_led = LED('Pi Pico', 25)
@@ -60,7 +62,7 @@ class SceneControl:
             Button('IR4', 19),
         ]
 
-        # Devices that need names
+        # Devices I don't have assigned yet
         self.LED1 = LED('LED1', 7)
         self.LED2 = LED('LED2', 12)
         self.LED3 = LED('LED3', 13)
@@ -73,7 +75,7 @@ class SceneControl:
 
 
     def off(self):
-        """Turn off the scene.
+        """Turn the scene off.
         """
         self.smoke.off()
         self.pi_led(0)
@@ -85,29 +87,34 @@ class SceneControl:
         self.RELAY2.off()
         self.RELAY3.off()
 
-    def scene(self, button):
-        """Turn on a scene.
+    def on(self, button):
+        """Turn the scene on.
         """
-        if button == 'Stop':
+        self.smoke.off()
+        self.pi_led(25)
+        self.tram.speed = 16384
+        self.tram.forward()
+        self.carousel.speed = 16384
+        self.carousel.forward()
+        self.LED1(75)
+        self.LED2(75)
+        self.LED3(75)
+        self.RELAY2.off()
+        self.RELAY3.off()
+
+    def button_handler(self, button_name):
+        """Dispatch button presses.
+        """
+        if button_name == 'Stop':
             print('Turning off scene')
             self.off()
 
-        elif button == 'Start':
-            print('Turning on scene', button)
-            self.smoke.off()
-            self.pi_led(25)
-            self.tram.speed = 16384
-            self.tram.forward()
-            self.carousel.speed = 16384
-            self.carousel.forward()
-            self.LED1(75)
-            self.LED2(75)
-            self.LED3(75)
-            self.RELAY2.off()
-            self.RELAY3.off()
+        elif button_name == 'Start':
+            print('Turning on scene', button_name)
+            self.on()
 
         else:
-            print('Unknown button', button)
+            print('Unknown button', button_name)
 
     def run_once(self):
         """One iteration of our main loop.
@@ -126,6 +133,8 @@ class SceneControl:
                 self.scene(button.name)
 
     def run_forever(self):
+        """Run the main loop until forcibly stopped.
+        """
         while True:
             try:
                 self.run_once()
