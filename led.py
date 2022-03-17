@@ -1,4 +1,4 @@
-import utime
+from time import sleep_us
 from machine import Pin, PWM
 
 
@@ -13,7 +13,7 @@ class LED:
         self.pwm.freq(frequency)
         self.pwm.duty_u16(0)
 
-    def __call__(self, brightness, fade_time=0.002, fade_steps=100):
+    def __call__(self, brightness, fade_time=2000, fade_steps=100):
         """Change the LED's brightness.
         """
         if brightness < 0 or brightness > 100:
@@ -28,6 +28,6 @@ class LED:
 
         for i in range(self.pwm.duty_u16(), target, fade_steps):
             self.pwm.duty_u16(i)
-            utime.sleep(fade_time)
+            sleep_us(fade_time)
 
         self.pwm.duty_u16(target)
