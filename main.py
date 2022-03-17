@@ -28,14 +28,14 @@ Pins:
     GP27    RLY-IN2
     GP28    RLY-IN1
 """
-import utime
-from machine import Pin, PWM
+from time import sleep_us, ticks_us
+from machine import Pin
 
 from button import Button
 from led import LED
 from train import Train
 
-MAIN_LOOP_TIME = 0.005
+MAIN_LOOP_TIME = 5000  # (us) Minimum time for our main loop, for button debouncing purposes
 
 
 class SceneControl:
@@ -136,13 +136,18 @@ class SceneControl:
         """Run the main loop until forcibly stopped.
         """
         while True:
+            start = ticks_us()
             try:
                 self.run_once()
             except KeyboardInterrupt:
                 raise
             except Exception as e:
                 print('Exception:', e.__class__.__name__, e)
-            utime.sleep(MAIN_LOOP_TIME)
+
+            # Determine how long to sleep
+            delay = ticks_us() - start
+            if delay > 0:
+                sleep_us(delay)
 
 
 if __name__ == '__main__':
